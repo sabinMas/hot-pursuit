@@ -127,6 +127,14 @@ public:
         {
             sprite.set_x(sprite.x() - speed);
         }
+        if (bn::keypad::up_held())
+        {
+            sprite.set_y(sprite.y() - speed);
+        }
+        if (bn::keypad::down_held())
+        {
+            sprite.set_y(sprite.y() + speed);
+        }
         // TODO: Add logic for up and down
 
         bounding_box = create_bounding_box(sprite, size);
