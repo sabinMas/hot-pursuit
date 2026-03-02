@@ -141,6 +141,21 @@ public:
         {
             sprite.set_y(sprite.y() + speed);
         }
+
+        //wrap player around the edges!!!
+        if (sprite.x() < MIN_X) {
+            sprite.set_x(MAX_X);
+        }
+        else if (sprite.x() > MAX_X) {
+            sprite.set_x(MIN_X);
+        }
+        if (sprite.y() < MIN_Y) {
+            sprite.set_y(MAX_Y);
+        }
+        else if (sprite.y() > MAX_Y) {
+            sprite.set_y(MIN_Y);
+        }
+
         // TODO: Add logic for up and down
 
         bounding_box = create_bounding_box(sprite, size);
@@ -259,6 +274,7 @@ int main()
             player.powerup_timer = Player::POWERUP_DURATION;
             powerup.active = false;
         }
+
         for (Enemy& e : enemies) {
             e.update(player);
             // Reset the current score and player position if the player collides with enemy
