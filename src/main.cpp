@@ -248,7 +248,7 @@ int main()
 
     // Create a player and initialize it
     // TODO: we will move the initialization logic to a constructor.
-    Player player = Player(44, 22, 5, PLAYER_SIZE);
+    Player player = Player(44, 22, 2, PLAYER_SIZE);
     // player.sprite.set_x(44);
     // player.sprite.set_y(22);
     // player.speed = 1.5;
