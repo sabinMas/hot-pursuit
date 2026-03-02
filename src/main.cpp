@@ -32,6 +32,10 @@ static constexpr int SCORE_Y = -70;
 static constexpr int HIGH_SCORE_X = -70;
 static constexpr int HIGH_SCORE_Y = -70;
 
+// Number of frames before adding an enemy 
+static constexpr int SPAWN_INTERVAL = 200;
+int frame_count = 0;
+
 /**
  * Creates a rectangle centered at a sprite's location with a given size.
  * sprite the sprite to center the box around
@@ -208,8 +212,6 @@ int main()
 
     //Add enemies to the vector
     enemies.push_back(Enemy(-30, 22, ENEMY_SIZE, bn::fixed(1)));
-    enemies.push_back(Enemy(0, 0, ENEMY_SIZE, bn::fixed(1)));
-    enemies.push_back(Enemy(22, 22, ENEMY_SIZE, bn::fixed(1)));
 
     // bn::sprite_ptr enemy_sprite = bn::sprite_items::square.create_sprite(-30, 22);
     // bn::rect enemy_bounding_box = create_bounding_box(enemy_sprite, ENEMY_SIZE);
@@ -225,8 +227,24 @@ int main()
                 scoreDisplay.resetScore();
                 player.sprite.set_x(44);
                 player.sprite.set_y(22);
+
+                //Keep only the first enemy
+                while (enemies.size() > 1 ) {
+                    enemies.pop_back();
+                }
+
+                break;
             }
 
+        }
+        //Every x amount of frames adds a new enemy at a random location
+        if (frame_count >= SPAWN_INTERVAL && enemies.size() < 5) {
+            int random_x = random.get_int(MIN_X, MAX_X);
+            int random_y = random.get_int(MIN_Y, MAX_Y);
+            enemies.push_back(Enemy(random_x, random_y, ENEMY_SIZE, bn::fixed(1)));
+            frame_count = 0;
+        } else {
+            frame_count++;
         }
         
 
