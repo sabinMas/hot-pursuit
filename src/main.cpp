@@ -9,6 +9,7 @@
 
 #include "common_fixed_8x16_font.h"
 #include "bn_sprite_items_dot.h"
+#include "bn_sprite_items_dot2.h"
 #include "bn_sprite_items_square.h"
 #include <bn_random.h>
 
@@ -205,7 +206,7 @@ public:
 class PowerUp
 {
     public:
-        PowerUp(int x, int y) : sprite(bn::sprite_items::dot.create_sprite(x, y)),
+        PowerUp(int x, int y) : sprite(bn::sprite_items::dot2.create_sprite(x, y)),
                                 bounding_box(create_bounding_box(sprite, {8, 8})),
                                 active(true)
     {
