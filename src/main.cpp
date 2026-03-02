@@ -143,6 +143,13 @@ public:
         // TODO: Add logic for up and down
 
         bounding_box = create_bounding_box(sprite, size);
+
+        if(is_invincible) {
+            powerup_timer--;
+            if (powerup_timer <= 0) {
+                is_invincible = false;
+            }
+        }
     }
 
     // Create the sprite. This will be moved to a constructor
@@ -150,6 +157,9 @@ public:
     bn::fixed speed;       // The speed of the player
     bn::size size;         // The width and height of the sprite
     bn::rect bounding_box; // The rectangle around the sprite for checking collision
+    bool is_invincible = false;
+    int powerup_timer = 0;
+    static constexpr int POWERUP_DURATION = 200;
 };
 class Enemy
 {
@@ -192,6 +202,26 @@ public:
     bn::rect bounding_box;
 };
 
+class PowerUp
+{
+    public:
+        PowerUp(int x, int y) : sprite(bn::sprite_items::dot.create_sprite(x, y)),
+                                bounding_box(create_bounding_box(sprite, {8, 8})),
+                                active(true)
+    {
+    }
+
+    void update()
+    {
+        bounding_box = create_bounding_box(sprite, {8, 8});
+        sprite.set_visible(active);
+    }
+
+    bn::sprite_ptr sprite;
+    bn::rect bounding_box;
+    bool active;
+};
+
 int main()
 {
     bn::core::init();
@@ -210,6 +240,8 @@ int main()
     // player.bounding_box = create_bounding_box(player.sprite, player.size);
     bn::vector<Enemy, 5> enemies; // or bn::fixed(1)
 
+    PowerUp powerup(0, 0);
+
     //Add enemies to the vector
     enemies.push_back(Enemy(-30, 22, ENEMY_SIZE, bn::fixed(1)));
 
@@ -219,10 +251,17 @@ int main()
     while (true)
     {
         player.update();
+        powerup.update();
+
+        if (powerup.active && powerup.bounding_box.intersects(player.bounding_box)) {
+            player.is_invincible = true;
+            player.powerup_timer = Player::POWERUP_DURATION;
+            powerup.active = false;
+        }
         for (Enemy& e : enemies) {
             e.update(player);
             // Reset the current score and player position if the player collides with enemy
-            if (e.bounding_box.intersects(player.bounding_box))
+            if (e.bounding_box.intersects(player.bounding_box) && !player.is_invincible)
             {
                 scoreDisplay.resetScore();
                 player.sprite.set_x(44);
