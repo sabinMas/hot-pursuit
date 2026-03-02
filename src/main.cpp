@@ -10,6 +10,7 @@
 #include "common_fixed_8x16_font.h"
 #include "bn_sprite_items_dot.h"
 #include "bn_sprite_items_square.h"
+#include <bn_random.h>
 
 // Width and height of the the player bounding box
 static constexpr bn::size PLAYER_SIZE = {8, 8};
@@ -149,23 +150,48 @@ public:
 class Enemy
 {
 public:
-    Enemy(int starting_x, int starting_y, bn::size enemy_size) : sprite(bn::sprite_items::square.create_sprite(starting_x, starting_y)),
-                                                                 size(enemy_size),
-                                                                 bounding_box(create_bounding_box(sprite, size))
+    Enemy(int starting_x, int starting_y, bn::size enemy_size, bn::fixed enemy_speed) : sprite(bn::sprite_items::square.create_sprite(starting_x, starting_y)),
+                                                                                        speed(enemy_speed),
+                                                                                        size(enemy_size),
+                                                                                        bounding_box(create_bounding_box(sprite, size))
     {
     }
-    void update()
+
+    void update(Player &player)
     {
+        // Move towards player in 4 directions (up/down/left/right)
+        if (player.sprite.x() > sprite.x())
+        {
+            sprite.set_x(sprite.x() + speed);
+        }
+        else if (player.sprite.x() < sprite.x())
+        {
+            sprite.set_x(sprite.x() - speed);
+        }
+
+        if (player.sprite.y() > sprite.y())
+        {
+            sprite.set_y(sprite.y() + speed);
+        }
+        else if (player.sprite.y() < sprite.y())
+        {
+            sprite.set_y(sprite.y() - speed);
+        }
+
+        // Update bounding box
         bounding_box = create_bounding_box(sprite, size);
     }
+
     bn::sprite_ptr sprite;
-    bn::size size;         // The width and height of the sprite
-    bn::rect bounding_box; // The rectangle around the sprite for checking collision
+    bn::fixed speed;
+    bn::size size;
+    bn::rect bounding_box;
 };
 
 int main()
 {
     bn::core::init();
+    bn::random random;
 
     // Create a new score display
     ScoreDisplay scoreDisplay = ScoreDisplay();
@@ -178,14 +204,15 @@ int main()
     // player.speed = 1.5;
     // player.size = PLAYER_SIZE;
     // player.bounding_box = create_bounding_box(player.sprite, player.size);
-    Enemy enemy = Enemy(-30, 22, ENEMY_SIZE);
+    Enemy enemy = Enemy(-30, 22, ENEMY_SIZE, 1); // or bn::fixed(1)
+
     // bn::sprite_ptr enemy_sprite = bn::sprite_items::square.create_sprite(-30, 22);
     // bn::rect enemy_bounding_box = create_bounding_box(enemy_sprite, ENEMY_SIZE);
 
     while (true)
     {
         player.update();
-        enemy.update();
+        enemy.update(player);
         // Reset the current score and player position if the player collides with enemy
         if (enemy.bounding_box.intersects(player.bounding_box))
         {
